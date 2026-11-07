@@ -44,16 +44,16 @@ const save = () => localStorage.setItem(SAVE_KEY, JSON.stringify(state));
 const prog = id => state.progress[id] || { seen: 0, streak: 0, mistakes: 0, learned: false };
 const learnedCount = () => cards.filter(c => prog(c.id).learned).length;
 const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
-let lastCardId = null;
+let lastCardId = null, fromPending = false;
 
 function nextCard() {
   state.step += 1;
   const dir = Math.random() < 0.5 ? 'enToDe' : 'deToEn';
-  const pick = id => { lastCardId = id; return [byId[id], dir]; };
+  const pick = (id, pending = false) => { lastCardId = id; fromPending = pending; return [byId[id], dir]; };
 
   // 1. A card that was answered wrong and is due again.
   const i = state.pending.findIndex(p => p.dueStep <= state.step && p.cardId !== lastCardId);
-  if (i >= 0) return pick(state.pending.splice(i, 1)[0].cardId);
+  if (i >= 0) return pick(state.pending.splice(i, 1)[0].cardId, true);
 
   const unseen = cards.filter(c => prog(c.id).seen === 0);
   const seen = cards.filter(c => prog(c.id).seen > 0 && c.id !== lastCardId);
@@ -115,7 +115,14 @@ function next() {
   input.value = '';
   setMsg('');
   $('action').textContent = 'Check'; $('action').classList.remove('ok');
+  $('skip').hidden = false;
   input.focus();
+}
+
+// Skip: go to the next card without changing progress. A due repeat stays in the queue.
+function skip() {
+  if (fromPending) { state.pending.push({ cardId: card.id, dueStep: state.step + randInt(4, 8) }); save(); }
+  next();
 }
 
 function submit() {
@@ -127,6 +134,7 @@ function submit() {
     phase = 'correct';
     setMsg('Correct', 'green');
     $('action').textContent = 'Next'; $('action').classList.add('ok');
+    $('skip').hidden = true;
   } else if (phase === 'answering') {
     hadMistake = true; left -= 1;
     if (left > 0) setMsg(`Wrong. Attempts left: ${left}`, 'red');
@@ -142,6 +150,8 @@ function submit() {
 $('form').addEventListener('submit', e => { e.preventDefault(); submit(); });
 $('action').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
 $('action').addEventListener('click', submit);
+$('skip').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
+$('skip').addEventListener('click', skip);
 $('close').addEventListener('click', () => { input.blur(); showHome(); });
 $('start').addEventListener('click', showStudy);
 

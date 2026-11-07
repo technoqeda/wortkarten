@@ -30,7 +30,7 @@
   #home .primary { width:auto; padding:14px 32px; font-size:22px; }
 
   #study { max-width:520px; margin:0 auto; }
-  .bar { height:44px; display:flex; align-items:center; }
+  .bar { height:44px; display:flex; align-items:center; justify-content:space-between; }
   .link { background:none; color:var(--blue); font-size:17px; padding:0; }
   .dir { text-align:center; color:var(--muted); font-size:15px; margin:24px 0 20px; }
   .prompt { text-align:center; font-size:28px; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
@@ -50,7 +50,7 @@
 </div>
 
 <div id="study" hidden>
-  <div class="bar"><button class="link" id="close">Close</button></div>
+  <div class="bar"><button class="link" id="close">Close</button><button class="link" id="skip">Skip</button></div>
   <div class="dir" id="dir"></div>
   <div class="prompt" id="prompt"></div>
   <div class="hint" id="hint" hidden></div>
