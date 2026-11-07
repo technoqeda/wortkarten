@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wortkarten">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Wortkarten</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root { color-scheme: light dark; --bg:#fff; --fg:#000; --muted:#8e8e93; --line:#c7c7cc; --blue:#007aff; --red:#ff3b30; --orange:#ff9500; --green:#34c759; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#000; --fg:#fff; --muted:#8e8e93; --line:#48484a; --blue:#0a84ff; --red:#ff453a; --orange:#ff9f0a; --green:#30d158; } }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust:100%; }
+  body { padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom); }
+  [hidden] { display:none !important; }
+  button { font:inherit; border:0; border-radius:12px; cursor:pointer; }
+  .primary { background:var(--blue); color:#fff; font-size:17px; font-weight:600; padding:14px; width:100%; }
+  .primary.ok { background:var(--green); }
+
+  #home { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; }
+  #home p { font-size:22px; margin:0; }
+  #home .primary { width:auto; padding:14px 32px; font-size:22px; }
+
+  #study { max-width:520px; margin:0 auto; }
+  .bar { height:44px; display:flex; align-items:center; }
+  .link { background:none; color:var(--blue); font-size:17px; padding:0; }
+  .dir { text-align:center; color:var(--muted); font-size:15px; margin:24px 0 20px; }
+  .prompt { text-align:center; font-size:28px; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
+  .hint { text-align:center; color:var(--muted); font-size:16px; margin-top:6px; }
+  input { display:block; width:100%; margin:20px 0; height:48px; padding:0 12px; font-size:20px;
+    color:var(--fg); background:transparent; border:1px solid var(--line); border-radius:10px; outline:none; }
+  input:focus { border-color:var(--blue); }
+  .msg { text-align:center; font-size:17px; font-weight:500; white-space:pre-line; margin:0 0 20px; }
+  .msg.red { color:var(--red); } .msg.orange { color:var(--orange); } .msg.green { color:var(--green); }
+</style>
+</head>
+<body>
+
+<div id="home">
+  <p id="learned">Loading…</p>
+  <button class="primary" id="start" disabled>Start</button>
+</div>
+
+<div id="study" hidden>
+  <div class="bar"><button class="link" id="close">Close</button></div>
+  <div class="dir" id="dir"></div>
+  <div class="prompt" id="prompt"></div>
+  <div class="hint" id="hint" hidden></div>
+  <form id="form" autocomplete="off">
+    <input id="answer" type="text" placeholder="Answer" autocomplete="off" autocorrect="off"
+           autocapitalize="off" spellcheck="false" enterkeyhint="done">
+  </form>
+  <p class="msg" id="msg" hidden></p>
+  <button class="primary" id="action">Check</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
