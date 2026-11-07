@@ -1,5 +1,5 @@
 // Offline cache. Bump VERSION when files change.
-const VERSION = 'wk-3';
+const VERSION = 'wk-4';
 const FILES = ['./', 'index.html', 'app.js', 'cards.json', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
