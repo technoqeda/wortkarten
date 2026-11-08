@@ -4,7 +4,7 @@ const SAVE_KEY = 'wortkarten.state.v1';
 const $ = id => document.getElementById(id);
 
 // Only technical differences are ignored: extra spaces, final . ! ? …,
-// typographic apostrophes and dashes. Case, articles, umlauts, ß stay strict.
+// typographic apostrophes and dashes. German: case, articles, umlauts, ß stay strict.
 function normalize(s) {
   let t = s.replace(/[\u2019\u2018\u02BC\u00B4]/g, "'").replace(/[\u2013\u2014]/g, '-').replace(/\u00A0/g, ' ');
   t = t.trim().split(/\s+/).join(' ');
@@ -30,10 +30,12 @@ function accepted(card, dir) {
     ? (enIndex[enKey(card.en[0], card.hint)] || []) : (deIndex[normalize(card.de[0])] || []));
   ids.add(card.id);
   const res = new Set();
-  for (const id of ids) for (const a of (dir === 'enToDe' ? byId[id].de : byId[id].en)) res.add(normalize(a));
+  for (const id of ids) for (const a of (dir === 'enToDe' ? byId[id].de : byId[id].en)) res.add(key(a, dir));
   return res;
 }
-const isCorrect = (input, card, dir) => accepted(card, dir).has(normalize(input));
+// German answers keep case; English answers ignore case.
+const key = (s, dir) => dir === 'enToDe' ? normalize(s) : normalize(s).toLowerCase();
+const isCorrect = (input, card, dir) => accepted(card, dir).has(key(input, dir));
 const prompt = (card, dir) => dir === 'enToDe' ? card.en[0] : card.de[0];
 const answer = (card, dir) => dir === 'enToDe' ? card.de[0] : card.en[0];
 
