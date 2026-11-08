@@ -33,8 +33,11 @@ function accepted(card, dir) {
   for (const id of ids) for (const a of (dir === 'enToDe' ? byId[id].de : byId[id].en)) res.add(key(a, dir));
   return res;
 }
-// German answers keep case; English answers ignore case.
-const key = (s, dir) => dir === 'enToDe' ? normalize(s) : normalize(s).toLowerCase();
+// Commas are optional. German answers keep case; English answers ignore case.
+const key = (s, dir) => {
+  const t = normalize(s).replace(/\s*,\s*/g, ' ').trim();
+  return dir === 'enToDe' ? t : t.toLowerCase();
+};
 const isCorrect = (input, card, dir) => accepted(card, dir).has(key(input, dir));
 const prompt = (card, dir) => dir === 'enToDe' ? card.en[0] : card.de[0];
 const answer = (card, dir) => dir === 'enToDe' ? card.de[0] : card.en[0];
