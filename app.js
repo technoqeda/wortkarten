@@ -1,5 +1,6 @@
 // Wortkarten: same rules as the iOS version.
 const MAX_ATTEMPTS = 5;
+const CHAPTERS = 5; // cards from chapters 1..CHAPTERS are shown; raise to open the next chapter
 const SAVE_KEY = 'wortkarten.state.v1';
 const $ = id => document.getElementById(id);
 
@@ -15,9 +16,10 @@ function normalize(s) {
 let cards = [], byId = {}, deIndex = {}, enIndex = {};
 const enKey = (e, hint) => normalize(e) + '|' + (hint || '');
 
+// All cards are indexed (so answer checking sees every variant), only open chapters are shown.
 function buildDeck(list) {
-  cards = list;
-  for (const c of cards) {
+  cards = list.filter(c => c.ch <= CHAPTERS);
+  for (const c of list) {
     byId[c.id] = c;
     for (const d of c.de) (deIndex[normalize(d)] ||= []).push(c.id);
     for (const e of c.en) (enIndex[enKey(e, c.hint)] ||= []).push(c.id);
@@ -57,7 +59,7 @@ function nextCard() {
   const pick = (id, pending = false) => { lastCardId = id; fromPending = pending; return [byId[id], dir]; };
 
   // 1. A card that was answered wrong and is due again.
-  const i = state.pending.findIndex(p => p.dueStep <= state.step && p.cardId !== lastCardId);
+  const i = state.pending.findIndex(p => p.dueStep <= state.step && p.cardId !== lastCardId && byId[p.cardId]?.ch <= CHAPTERS);
   if (i >= 0) return pick(state.pending.splice(i, 1)[0].cardId, true);
 
   const unseen = cards.filter(c => prog(c.id).seen === 0);
