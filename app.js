@@ -77,6 +77,15 @@ function nextCard() {
   return pick(pool[pool.length - 1].id);
 }
 
+// "Learned" button: the card counts as learned (typo case); the answer still has to be typed in.
+function markLearned(id) {
+  const p = prog(id);
+  p.seen += 1; p.streak = Math.max(p.streak, 1); p.learned = true;
+  state.pending = state.pending.filter(x => x.cardId !== id);
+  state.progress[id] = p;
+  save();
+}
+
 function record(id, firstTry) {
   const p = prog(id);
   p.seen += 1;
@@ -95,7 +104,7 @@ function record(id, firstTry) {
 }
 
 // ---- Screens ----
-let card, dir, phase, left, hadMistake;
+let card, dir, phase, left, hadMistake, known;
 const input = $('answer');
 
 function showHome() {
@@ -114,7 +123,7 @@ function setMsg(text, color) {
 
 function next() {
   [card, dir] = nextCard();
-  phase = 'answering'; left = MAX_ATTEMPTS; hadMistake = false;
+  phase = 'answering'; left = MAX_ATTEMPTS; hadMistake = false; known = false;
   $('dir').textContent = dir === 'enToDe' ? 'Translate into German' : 'Translate into English';
   $('prompt').textContent = prompt(card, dir);
   const showHint = dir === 'enToDe' && card.hint;
@@ -122,7 +131,7 @@ function next() {
   input.value = '';
   setMsg('');
   $('action').textContent = 'Check'; $('action').classList.remove('ok');
-  $('skip').hidden = false;
+  $('skip').hidden = false; $('known').hidden = false;
   input.focus();
 }
 
@@ -137,8 +146,8 @@ function submit() {
   if (!normalize(input.value)) { input.focus(); return; }
   const right = `Correct answer:\n${answer(card, dir)}\nType it in`;
   if (isCorrect(input.value, card, dir)) {
-    record(card.id, !hadMistake);
-    phase = 'correct';
+    if (known) markLearned(card.id); else record(card.id, !hadMistake);
+    phase = 'correct'; $('known').hidden = true;
     setMsg('Correct', 'green');
     $('action').textContent = 'Next'; $('action').classList.add('ok');
     $('skip').hidden = true;
@@ -159,6 +168,12 @@ $('action').addEventListener('pointerdown', e => e.preventDefault()); // keep ke
 $('action').addEventListener('click', submit);
 $('skip').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
 $('skip').addEventListener('click', skip);
+$('known').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
+$('known').addEventListener('click', () => {
+  known = true; phase = 'mustRetype'; $('known').hidden = true;
+  setMsg(`Correct answer:\n${answer(card, dir)}\nType it in`, 'orange');
+  input.value = ''; input.focus();
+});
 $('close').addEventListener('click', () => { input.blur(); showHome(); });
 $('start').addEventListener('click', showStudy);
 

@@ -24,6 +24,7 @@
   button { font:inherit; border:0; border-radius:12px; cursor:pointer; }
   .primary { background:var(--blue); color:#fff; font-size:17px; font-weight:600; padding:14px; width:100%; }
   .primary.ok { background:var(--green); }
+  .secondary { background:none; color:var(--blue); border:1px solid var(--blue); font-size:17px; padding:13px; width:100%; margin-top:10px; }
 
   #home { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; }
   #home p { font-size:22px; margin:0; }
@@ -60,6 +61,7 @@
   </form>
   <p class="msg" id="msg" hidden></p>
   <button class="primary" id="action">Check</button>
+  <button class="secondary" id="known">Learned</button>
 </div>
 
 <script src="app.js"></script>
