@@ -131,7 +131,7 @@ function next() {
   input.value = '';
   setMsg('');
   $('action').textContent = 'Check'; $('action').classList.remove('ok');
-  $('skip').hidden = false; $('known').hidden = false;
+  $('skip').hidden = false; $('known').hidden = false; $('show').hidden = false;
   input.focus();
 }
 
@@ -147,14 +147,14 @@ function submit() {
   const right = `Correct answer:\n${answer(card, dir)}\nType it in`;
   if (isCorrect(input.value, card, dir)) {
     if (known) markLearned(card.id); else record(card.id, !hadMistake);
-    phase = 'correct'; $('known').hidden = true;
+    phase = 'correct'; $('known').hidden = true; $('show').hidden = true;
     setMsg('Correct', 'green');
     $('action').textContent = 'Next'; $('action').classList.add('ok');
     $('skip').hidden = true;
   } else if (phase === 'answering') {
     hadMistake = true; left -= 1;
     if (left > 0) setMsg(`Wrong. Attempts left: ${left}`, 'red');
-    else { phase = 'mustRetype'; setMsg(right, 'orange'); }
+    else { phase = 'mustRetype'; setMsg(right, 'orange'); $('show').hidden = true; }
     input.value = '';
   } else {
     setMsg('Wrong. ' + right, 'orange');
@@ -170,7 +170,14 @@ $('skip').addEventListener('pointerdown', e => e.preventDefault()); // keep keyb
 $('skip').addEventListener('click', skip);
 $('known').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
 $('known').addEventListener('click', () => {
-  known = true; phase = 'mustRetype'; $('known').hidden = true;
+  known = true; phase = 'mustRetype'; $('known').hidden = true; $('show').hidden = true;
+  setMsg(`Correct answer:\n${answer(card, dir)}\nType it in`, 'orange');
+  input.value = ''; input.focus();
+});
+// "Show": counts as one wrong answer, shows the answer; it still has to be typed in.
+$('show').addEventListener('pointerdown', e => e.preventDefault()); // keep keyboard open
+$('show').addEventListener('click', () => {
+  hadMistake = true; phase = 'mustRetype'; $('known').hidden = true; $('show').hidden = true;
   setMsg(`Correct answer:\n${answer(card, dir)}\nType it in`, 'orange');
   input.value = ''; input.focus();
 });
